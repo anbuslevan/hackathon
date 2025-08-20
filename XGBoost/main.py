@@ -79,7 +79,7 @@ def main():
         'feature_columns': feature_engineer.feature_columns,
         'thresholds': trainer.thresholds
     }
-    joblib.dump(preprocessing_artifacts, f"{BASE_MODEL_DIR}preprocessing_pipeline.joblib")
+    joblib.dump(preprocessing_artifacts, f"{BASE_MODEL_DIR}/preprocessing_pipeline.joblib")
     
     # Save metrics report
     final_report = {
