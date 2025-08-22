@@ -1,0 +1,59 @@
+🎯 Core Idea
+	•	Build an AI-powered family recommendation engine that:
+	1.	Suggests missing devices for the user & their family.
+	2.	Recommends upgrades or trade-ins when devices get old.
+	3.	Suggests products within the family’s spending range (price band).
+	4.	Encourages full brand ecosystem adoption.
+
+⸻
+
+✅ Requirements
+	1.	Ecosystem Completion – Detect and suggest missing products (watch, microwave, fridge, etc.).
+	2.	Price Band Estimation (Category-Wise)
+	3.	Lifecycle Awareness – Suggest trade-ins/upgrades based on time since purchase.
+
+⸻
+
+🧠 Algorithm Stack (After Removing Collaborative Filtering)
+	1.	Association Rule Mining (FP-Growth) → Find Missing Products
+		•	Detects product bundles.
+		•	Example: Families who bought Mobile + TV → usually buy Smartwatch.
+	2.	XGBoost / LightGBM → Price Band & Budget Prediction
+		•	Learns spending power across families.
+		•	Applies affordability ratio to keep suggestions realistic.
+		•	Example : Mobile category ceiling: ₹1,00,000, User bought: ₹80,000 mobile → 80% affordability ratio, TV category ceiling: ₹2,00,000 → Suggest TVs around ₹1.6L, Microwave ceiling: ₹40,000 → Suggest microwaves around ₹32K, Lifecycle check: If the ₹80K mobile is 2.5 years old → suggest trade-in for newer model.
+	3.	Survival Analysis (Cox / Weibull / Kaplan-Meier) → Lifecycle / Trade-In Timing
+		•	Predicts when devices are due for upgrade.
+		•	Suggests upgrades before device typically gets replaced.
+	4.	LambdaMART / Neural Ranking → Next-Best Upgrade
+		•	Ranks potential upgrades and trade-in options.
+		•	Ensures user sees the most relevant and affordable next step.
+
+⸻
+
+🚀 Why This Works (Even Without Collaborative Filtering)
+	•	Association Rules handle ecosystem gaps.
+	•	XGBoost/LightGBM ensures budget-aware predictions.
+	•	Survival Models handle upgrade timing.
+	•	Ranking Models make sure suggestions are relevant.
+
+This keeps it rule+ML hybrid, easy to implement, and avoids the complexity of full collaborative filtering.
+
+
+data/catalog.csv schema
+"?column?","sku","data","created_date","modified_date","product_type","delivery_group","partner_attributes","is_secure","group_id","online_to_offline","partner_home_delivery"
+"mobile","SM-G981ULBAXAA","{ ""product_display_name"": ""Galaxy S20 5G 128GB (Unlocked)"", ""taxonomy"": { ""product_category"": ""phones"", ""product_family"": ""mobile"" } }","2025-08-18 08:11:14.997974+00","2025-08-20 15:32:39.889898+00","Physical",,,FALSE,,,
+
+Sku details (data/lineitem.csv) schema
+"data"
+"{ ""sku"": ""BNDL-1564738352688"", ""sale_price"": { ""value"": 400, ""currency"": ""USD"" } }"
+
+Order detail of one user (data/orderdetail.csv)
+"data","internal"
+"{ ""cost"": { ""total"": 165.29 }, ""user_info"": { ""identity_id"": ""55dac6d925288c7c872d5af4019db4d38439407cddea28fcd0f224fb6d053163e605735d60bc1a430e717610a7b47f8b"", ""family_id"": """" }, ""line_items"": { ""738d6c6c-e245-4eb6-b46e"": { ""sku"": ""SM-R630NZAAXAR"", ""line_items"": { ""738d16c6c-e2145-4eb6"": { ""sku"": ""SM-CHILD1"", ""line_item_cost"": { ""total"": 15.29 } } }, ""line_item_cost"": { ""total"": 165.29 } } }, ""submission_date"": ""2025-06-09T10:29:51.040Z"" }",
+
+Here submission will be the ordered date, duplicate line item (sku id) will be the quntity
+
+The above all the data I have, Write a ML Pipeline code to generate a AI model that will fulfill the requirements. (For example, Products to suggest, Products to updgrade(both old product and just better product))
+
+AI will suggest the products based on the famil_id not with single user identity id, Use the above mentioned algorithms efficiently. Don't go with creation of sampe data. This AI model specific to one brand. Save the model and write a test case to test the model.
